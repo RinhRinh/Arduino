@@ -1,30 +1,21 @@
-//www.elegoo.com
-//2016.12.9
+
 
 #include <LiquidCrystal.h>
 int tempPin = 0;
 //                BS  E  D4 D5  D6 D7
-LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+LiquidCrystal lcd(2, 8, 9, 10, 11, 12);
 
-const uint8_t blue = 19;
-const uint8_t green = 18;
-const uint8_t yellow = 17;
-const uint8_t red = 16;
+#define BLUE 3
+#define GREEN 5
+#define RED 6
 
 void setup()
 {
-    /*lcd.begin(cols, rows)
-    lcd: a variable of type LiquidCrystal
-    cols: the number of columns that the display has
-    rows: the number of rows that the display has 
-  */
-
     lcd.begin(16, 2);
 
-    pinMode(blue, OUTPUT);
-    pinMode(green, OUTPUT);
-    pinMode(yellow, OUTPUT);
-    pinMode(red, OUTPUT);
+    pinMode(RED, OUTPUT);
+    pinMode(GREEN, OUTPUT);
+    pinMode(BLUE, OUTPUT);
 }
 void loop()
 {
@@ -61,29 +52,25 @@ void handleDisplayLed(float tempC)
 {
     if (tempC > 30)
     {
-        clearAll();
-        digitalWrite(red, HIGH);
+        setColor(255, 0, 0); // Red Color
     }
     else if ((tempC > 20) && (tempC <= 30))
     {
-        clearAll();
-        digitalWrite(yellow, HIGH);
+        setColor(255, 255, 0); // Yellow Color
     }
     else if ((tempC > 10) && (tempC <= 20))
     {
-        clearAll();
-        digitalWrite(green, HIGH);
+        setColor(0, 255, 0); // Green Color
     }
     else if (tempC <= 10)
     {
-        clearAll();
-        digitalWrite(blue, HIGH);
+        setColor(0, 0, 255); // blue Color
     }
 }
-void clearAll()
+
+void setColor(int redValue, int greenValue, int blueValue)
 {
-    digitalWrite(red, LOW);
-    digitalWrite(yellow, LOW);
-    digitalWrite(green, LOW);
-    digitalWrite(blue, LOW);
+    analogWrite(RED, redValue);
+    analogWrite(GREEN, greenValue);
+    analogWrite(BLUE, blueValue);
 }
