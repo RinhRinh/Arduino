@@ -9,6 +9,11 @@ LiquidCrystal lcd(2, 8, 9, 10, 11, 12);
 #define GREEN 5
 #define RED 6
 
+int tempType = 0;
+int buttonPin = 16;
+int buttonNew;
+int buttonOld = 0;
+
 void setup()
 {
     lcd.begin(16, 2);
@@ -31,40 +36,50 @@ void loop()
 
 void handleDisplayLCD(float tempC, float tempF)
 {
-    // Display Temperature in C
-    lcd.setCursor(0, 0);
-    lcd.print("Temp         C  ");
-    // Display Temperature in F
-    //lcd.print("Temp         F  ");
-    lcd.setCursor(6, 0);
-    // Display Temperature in C
-    lcd.print(tempC);
-    // Display Temperature in F
-    //lcd.print(tempF);
-    delay(500);
-    lcd.setCursor(0, 1);
-    lcd.print("Temp         F  ");
-    lcd.setCursor(6, 1);
-    lcd.print(tempF);
+    buttonNew = digitalRead(buttonPin);
+
+    if (buttonOld == 0 && buttonNew == 1)
+    {
+        if (tempType == 0)
+        {
+            lcd.setCursor(0, 0);
+            lcd.print("Temp         C  ");
+            lcd.setCursor(6, 0);
+            lcd.print(tempC);
+            tempType = 1;
+            delay(500);
+        }
+        else
+        {
+            lcd.setCursor(0, 0);
+            lcd.print("Temp         F  ");
+            lcd.setCursor(6, 0);
+            lcd.print(tempF);
+            tempType = 0;
+            delay(500);
+        }
+    }
+    buttonOld = buttonNew;
+    delay(100);
 }
 
 void handleDisplayLed(float tempC)
 {
     if (tempC > 30)
     {
-        setColor(255, 0, 0); // Red Color
+        setColor(100, 0, 0); // Red Color
     }
     else if ((tempC > 20) && (tempC <= 30))
     {
-        setColor(255, 255, 0); // Yellow Color
+        setColor(100, 100, 0); // Yellow Color
     }
     else if ((tempC > 10) && (tempC <= 20))
     {
-        setColor(0, 255, 0); // Green Color
+        setColor(0, 100, 0); // Green Color
     }
     else if (tempC <= 10)
     {
-        setColor(0, 0, 255); // blue Color
+        setColor(0, 0, 100); // blue Color
     }
 }
 
