@@ -16,6 +16,7 @@ int buttonOld = 0;
 
 void setup()
 {
+    Serial.begin(9600);
     lcd.begin(16, 2);
 
     pinMode(RED, OUTPUT);
@@ -25,38 +26,63 @@ void setup()
 void loop()
 {
     int tempReading = analogRead(tempPin);
+
+    Serial.println(tempReading);
+
     double tempK = log(10000.0 * ((1024.0 / tempReading - 1)));
     tempK = 1 / (0.001129148 + (0.000234125 + (0.0000000876741 * tempK * tempK)) * tempK); //  Temp Kelvin
     float tempC = tempK - 273.15;                                                          // Convert Kelvin to Celcius
     float tempF = (tempC * 9.0) / 5.0 + 32.0;
 
-    handleDisplayLCD(tempC, tempF);
+    handleDisplayLCD(tempC, tempF, tempK);
     handleDisplayLed(tempC);
 }
 
-void handleDisplayLCD(float tempC, float tempF)
+void handleDisplayLCD(float tempC, float tempF, double tempK)
 {
+
     buttonNew = digitalRead(buttonPin);
 
-    if (buttonOld == 0 && buttonNew == 1)
+    if (tempType == 0)
     {
-        if (tempType == 0)
+        lcd.setCursor(0, 0);
+        lcd.print("Temp         C  ");
+        lcd.setCursor(6, 0);
+        lcd.print(tempC);
+        delay(500);
+
+        Serial.print("tempC1: ");
+        Serial.println(tempC);
+
+        if (buttonOld == 0 && buttonNew == 1)
         {
-            lcd.setCursor(0, 0);
-            lcd.print("Temp         C  ");
-            lcd.setCursor(6, 0);
-            lcd.print(tempC);
             tempType = 1;
-            delay(500);
         }
-        else
+    }
+    else if (tempType == 1)
+    {
+        lcd.setCursor(0, 0);
+        lcd.print("Temp         F  ");
+        lcd.setCursor(6, 0);
+        lcd.print(tempF);
+        delay(500);
+
+        if (buttonOld == 0 && buttonNew == 1)
         {
-            lcd.setCursor(0, 0);
-            lcd.print("Temp         F  ");
-            lcd.setCursor(6, 0);
-            lcd.print(tempF);
+            tempType = 2;
+        }
+    }
+    else
+    {
+        lcd.setCursor(0, 0);
+        lcd.print("Temp          K ");
+        lcd.setCursor(6, 0);
+        lcd.print(tempK);
+        delay(500);
+
+        if (buttonOld == 0 && buttonNew == 1)
+        {
             tempType = 0;
-            delay(500);
         }
     }
     buttonOld = buttonNew;
