@@ -6,17 +6,23 @@ LiquidCrystal lcd(2, 8, 9, 10, 11, 12);
 #define GREEN 5
 #define RED 6
 
-int tempPin = 0;
+const int tempPin = 0;
 int tempType = 0;
-int buttonPin = 16;
+
+const int buttonPin = 16;
+const long intervalButton = 100;
+unsigned long previousMillisButton = 0;
 int buttonNew;
 int buttonOld = 1;
 
 unsigned long currentMillis = 0;
 unsigned long previousMillisLCD = 0;
-unsigned long previousMillisButton = 0;
 const long intervalLCD = 500;
-const long intervalButton = 100;
+
+int tempReading;
+double tempK;
+float tempC;
+float tempF;
 
 void setup()
 {
@@ -30,16 +36,23 @@ void setup()
 
 void loop()
 {
-    int tempReading = analogRead(tempPin);
-
-    double tempK = log(10000.0 * ((1024.0 / tempReading - 1)));
-    tempK = 1 / (0.001129148 + (0.000234125 + (0.0000000876741 * tempK * tempK)) * tempK); //  Temp Kelvin
-    float tempC = tempK - 273.15;                                                          // Convert Kelvin to Celcius
-    float tempF = (tempC * 9.0) / 5.0 + 32.0;
-
+    // process input
+    processTemp();
     handleButton();
-    handleDisplayLCD(tempC, tempF, tempK);
-    handleDisplayLed(tempC);
+
+    // action
+    handleDisplayLCD();
+    handleDisplayLed();
+}
+
+void processTemp()
+{
+    tempReading = analogRead(tempPin);
+
+    tempK = log(10000.0 * ((1024.0 / tempReading - 1)));
+    tempK = 1 / (0.001129148 + (0.000234125 + (0.0000000876741 * tempK * tempK)) * tempK); //  Temp Kelvin
+    tempC = tempK - 273.15;                                                                // Convert Kelvin to Celcius
+    tempF = (tempC * 9.0) / 5.0 + 32.0;
 }
 
 void handleButton()
@@ -73,7 +86,7 @@ void handleButton()
     delay(100);
 }
 
-void handleDisplayLCD(float tempC, float tempF, double tempK)
+void handleDisplayLCD()
 {
     currentMillis = millis();
 
@@ -105,7 +118,7 @@ void handleDisplayLCD(float tempC, float tempF, double tempK)
     }
 }
 
-void handleDisplayLed(float tempC)
+void handleDisplayLed()
 {
     if (tempC > 30)
     {
