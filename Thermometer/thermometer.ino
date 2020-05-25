@@ -58,9 +58,9 @@ void loop()
 {
     // process input
     processTemp();
-    handleButtonThermometer();
-    handleClockSetTimeButtons();
+    handleThermometerButton();
     calculateClockInfo();
+    handleClockButtons();
 
     // action
     handleDisplayLCDForThermometer();
@@ -73,12 +73,12 @@ void processTemp()
     tempReading = analogRead(tempPin);
 
     tempK = log(10000.0 * ((1024.0 / tempReading - 1)));
-    tempK = 1 / (0.001129148 + (0.000234125 + (0.0000000876741 * tempK * tempK)) * tempK); //  Temp Kelvin
-    tempC = tempK - 273.15;                                                                // Convert Kelvin to Celcius
+    tempK = 1 / (0.001129148 + (0.000234125 + (0.0000000876741 * tempK * tempK)) * tempK);
+    tempC = tempK - 273.15;
     tempF = (tempC * 9.0) / 5.0 + 32.0;
 }
 
-void handleButtonThermometer()
+void handleThermometerButton()
 {
     buttonNewThermometer = digitalRead(buttonPinThermometer);
 
@@ -210,11 +210,38 @@ void handleClockButtons()
         if (buttonOldClockHour == 0 && buttonNewClockHour == 1)
         {
             hourDisplay = hourDisplay + 1;
+
+            if (hourDisplay == 10)
+            {
+                hourDisplay = 0;
+                tenHourDisplay = tenHourDisplay + 1;
+            }
+
+            if ((tenHourDisplay == 1) && (hourDisplay == 3))
+            {
+                secondDisplay = 0;
+                tenSecondDisplay = 0;
+                minuteDisplay = 0;
+                tenMinuteDisplay = 0;
+                hourDisplay = 1;
+                tenHourDisplay = 0;
+            }
+
+            if ((tenHourDisplay == 1) && (hourDisplay == 2))
+            {
+                morningOrEvening = morningOrEvening + 1;
+            }
         }
 
         if (buttonOldClockMinute == 0 && buttonNewClockMinute == 1)
         {
             minuteDisplay = minuteDisplay + 1;
+
+            if (minuteDisplay > 0 && minuteDisplay % 10 == 0)
+            {
+                minuteDisplay = 0;
+                tenMinuteDisplay = tenMinuteDisplay + 1;
+            }
         }
         previousMillisClockButtonHour = currentMillis;
 
